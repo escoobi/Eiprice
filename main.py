@@ -11,7 +11,7 @@ aplicar_banco(f"INSERT INTO categoria (nome) SELECT 'alimentos' WHERE NOT EXISTS
 
 
 # Chama a função para realizar o scraping e armazenas no banco de dados
-extrair_dados(obter_categorias("alimentos", "gustavo.euguga@gmail.com", "Es05727143.."))
+extrair_dados(obter_categorias("alimentos", "*****", "****"))
 
 app = FastAPI()
 
