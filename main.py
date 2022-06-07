@@ -19,13 +19,16 @@ app = FastAPI()
 async def root():
     df = pd.DataFrame(consultar("select categoria.nome, sub_categoria.nome, produto.id, produto.nome, produto.img, produto.valor, produto.desconto, produto.dt_hora from produto inner join sub_categoria on sub_categoria.id = produto.id_sub_categoria inner join categoria on categoria.id = sub_categoria.id_categoria"), columns =['categoria', 'departamento', 'id', 'nome', 'img', 'valor', 'desconto', 'data_hora'])
     df.to_csv('assortment.csv')
-    return df.to_dict()
+    dd = df.to_dict('records')
+    return dd
 
 @app.get("/seller")
 async def seller():
     df = pd.DataFrame(consultar("select categoria.nome, sub_categoria.nome, produto.id, produto.nome, produto.img, produto.valor, produto.desconto, produto.dt_hora from produto inner join sub_categoria on sub_categoria.id = produto.id_sub_categoria inner join categoria on categoria.id = sub_categoria.id_categoria"), columns =['categoria', 'departamento', 'id', 'nome', 'img', 'valor', 'desconto', 'data_hora'])
     df.to_csv('seller.csv')
-    return df.to_dict()
+    dd = df.to_dict('records')
+    return dd
+    
 
 @app.get("/categoria/{item_id}")
 def read_item(item_id: int, q: Union[str, None] = None):
