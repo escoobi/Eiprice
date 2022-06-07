@@ -86,79 +86,79 @@ def extrair_dados(categoria) -> dict:
         
         print(len(lista_produtos))
         
-        for lista in enumerate(lista_produtos):
-            
-            lista.find_element(By.TAG_NAME, "button").click()
-            # Obter data hora
-            dt = datetime.now()
-            # Converter timestamp para gravar no banco
-            ts = datetime.timestamp(dt)
-            dt_hora = datetime.timestamp(dt)
-            try:
-                nome_produto = aguardar_elemento.until(expected_conditions.visibility_of_element_located((By.XPATH, "//div[@id='react-root']/div[2]/div[2]/div/div/div/div[2]/div[2]/h2"))).text
-            except:
-                nome_produto = None
-            try:
-                imagen_produto = aguardar_elemento.until(expected_conditions.visibility_of_element_located((By.XPATH, "//div[@id='react-root']/div[2]/div[2]/div/div/div/div[2]/div/div/figure/img"))).get_attribute("src")
-            except:
-                imagen_produto = None
-            try:
-                valor_produto = aguardar_elemento.until(expected_conditions.visibility_of_element_located((By.XPATH, "//div[@id='react-root']/div[2]/div[2]/div/div/div/div[2]/div[2]/div/span[2]"))).text
-            except:
-                valor_produto = 0
-            try:
-                valor_medio = aguardar_elemento.until(expected_conditions.visibility_of_element_located((By.XPATH, "//div[@id='react-root']/div[2]/div[2]/div/div/div/div[3]/div[2]/span"))).text
-                valor_medio = valor_medio.replace("R$", "")
-                valor_medio.strip()
-            except:
-                valor_medio = 0
-            try:
-                desconto = aguardar_elemento.until(expected_conditions.visibility_of_element_located((By.XPATH, "//div[@id='react-root']/div[2]/div[2]/div/div/div/div[3]/div[3]/span"))).text
-            except:
-                desconto = 0
-            try: 
-                descricao = aguardar_elemento.until(expected_conditions.visibility_of_element_located((By.XPATH, "//div[@id='react-root']/div[2]/div[2]/div/div/div/p"))).text
-            except:
-                descricao = None
-            
-            lista_valores_mercados: dict = {}
-            # Realiza a coleta dos dados dos valores dos outros mercados
-            for iten in range(1,4):
+        for id,  lista in enumerate(lista_produtos):
+            if id <= len(lista_produtos) - 2:
+                lista.find_element(By.TAG_NAME, "button").click()
+                # Obter data hora
+                dt = datetime.now()
+                # Converter timestamp para gravar no banco
+                ts = datetime.timestamp(dt)
+                dt_hora = datetime.timestamp(dt)
                 try:
-                    valor_mercado = lista.find_element(By.XPATH, f"//div[@id='react-root']/div[2]/div[2]/div/div/div/div[3]/div/div[{iten}]")
-                    lista_valores_mercados[obter_nome_mercados((valor_mercado.find_element(By.TAG_NAME, "img").get_attribute("src")))] = str(valor_mercado.find_element(By.TAG_NAME, "span").text).replace("R$", "").strip()
+                    nome_produto = aguardar_elemento.until(expected_conditions.visibility_of_element_located((By.XPATH, "//div[@id='react-root']/div[2]/div[2]/div/div/div/div[2]/div[2]/h2"))).text
                 except:
-                    pass
+                    nome_produto = None
+                try:
+                    imagen_produto = aguardar_elemento.until(expected_conditions.visibility_of_element_located((By.XPATH, "//div[@id='react-root']/div[2]/div[2]/div/div/div/div[2]/div/div/figure/img"))).get_attribute("src")
+                except:
+                    imagen_produto = None
+                try:
+                    valor_produto = aguardar_elemento.until(expected_conditions.visibility_of_element_located((By.XPATH, "//div[@id='react-root']/div[2]/div[2]/div/div/div/div[2]/div[2]/div/span[2]"))).text
+                except:
+                    valor_produto = 0
+                try:
+                    valor_medio = aguardar_elemento.until(expected_conditions.visibility_of_element_located((By.XPATH, "//div[@id='react-root']/div[2]/div[2]/div/div/div/div[3]/div[2]/span"))).text
+                    valor_medio = valor_medio.replace("R$", "")
+                    valor_medio.strip()
+                except:
+                    valor_medio = 0
+                try:
+                    desconto = aguardar_elemento.until(expected_conditions.visibility_of_element_located((By.XPATH, "//div[@id='react-root']/div[2]/div[2]/div/div/div/div[3]/div[3]/span"))).text
+                except:
+                    desconto = 0
+                try: 
+                    descricao = aguardar_elemento.until(expected_conditions.visibility_of_element_located((By.XPATH, "//div[@id='react-root']/div[2]/div[2]/div/div/div/p"))).text
+                except:
+                    descricao = None
             
-            # Tratando as variaveis antes de enviar para o banco.
-            imagen: str = str(imagen_produto).strip()
-            valor: str = str(valor_produto).strip()
-            valor = valor.replace(",", ".")
-            avg: str = str(valor_medio).strip()
-            avg = avg.replace(",", ".")
-            desconto: int = str(desconto).strip()
-            desconto = desconto.replace("%", "")
-            descricao: str =  str(descricao)
+                lista_valores_mercados: dict = {}
+                # Realiza a coleta dos dados dos valores dos outros mercados
+                for iten in range(1,4):
+                    try:
+                        valor_mercado = lista.find_element(By.XPATH, f"//div[@id='react-root']/div[2]/div[2]/div/div/div/div[3]/div/div[{iten}]")
+                        lista_valores_mercados[obter_nome_mercados((valor_mercado.find_element(By.TAG_NAME, "img").get_attribute("src")))] = str(valor_mercado.find_element(By.TAG_NAME, "span").text).replace("R$", "").strip()
+                    except:
+                        pass
+                
+                # Tratando as variaveis antes de enviar para o banco.
+                imagen: str = str(imagen_produto).strip()
+                valor: str = str(valor_produto).strip()
+                valor = valor.replace(",", ".")
+                avg: str = str(valor_medio).strip()
+                avg = avg.replace(",", ".")
+                desconto: int = str(desconto).strip()
+                desconto = desconto.replace("%", "")
+                descricao: str =  str(descricao)
                 
  
-            # Criar tabela produto e cadastrar produtos no banco de dados
-            aplicar_banco(f"CREATE TABLE produto (id INTEGER GENERATED BY DEFAULT AS IDENTITY (START WITH 101 CYCLE), nome varchar, primary key (id), img varchar, valor decimal, avg decimal, desconto int, descricao varchar, dt_hora varchar, id_sub_categoria int NOT NULL, foreign key (id_sub_categoria) references sub_categoria (id) ON DELETE CASCADE ON UPDATE CASCADE)")
-            aplicar_banco(f"INSERT INTO produto (nome, img, valor, avg, desconto, descricao, dt_hora, id_sub_categoria) SELECT '{nome_produto}', '{imagen}', '{valor}', '{avg}', '{desconto}', '{descricao}', '{dt_hora}', (select id from sub_categoria where nome = '{nome_sub_categoria}') WHERE NOT EXISTS (SELECT * FROM produto WHERE nome = '{nome_produto}')")
+                # Criar tabela produto e cadastrar produtos no banco de dados
+                aplicar_banco(f"CREATE TABLE produto (id INTEGER GENERATED BY DEFAULT AS IDENTITY (START WITH 101 CYCLE), nome varchar, primary key (id), img varchar, valor decimal, avg decimal, desconto int, descricao varchar, dt_hora varchar, id_sub_categoria int NOT NULL, foreign key (id_sub_categoria) references sub_categoria (id) ON DELETE CASCADE ON UPDATE CASCADE)")
+                aplicar_banco(f"INSERT INTO produto (nome, img, valor, avg, desconto, descricao, dt_hora, id_sub_categoria) SELECT '{nome_produto}', '{imagen}', '{valor}', '{avg}', '{desconto}', '{descricao}', '{dt_hora}', (select id from sub_categoria where nome = '{nome_sub_categoria}') WHERE NOT EXISTS (SELECT * FROM produto WHERE nome = '{nome_produto}')")
 
-            # Criar tabela outro e cadastrar os valores no banco de dados
-            aplicar_banco(f"CREATE TABLE outro (id INTEGER GENERATED BY DEFAULT AS IDENTITY (START WITH 81 CYCLE), nome varchar, primary key (id), valor decimal, id_produto int NOT NULL, foreign key (id_produto) references produto (id) ON DELETE CASCADE ON UPDATE CASCADE)")
+                # Criar tabela outro e cadastrar os valores no banco de dados
+                aplicar_banco(f"CREATE TABLE outro (id INTEGER GENERATED BY DEFAULT AS IDENTITY (START WITH 81 CYCLE), nome varchar, primary key (id), valor decimal, id_produto int NOT NULL, foreign key (id_produto) references produto (id) ON DELETE CASCADE ON UPDATE CASCADE)")
                 
-            # Loop para percorer o dicionario dos valores obtidos dos concorrentes
-            for iten in lista_valores_mercados:
-                valor_outro: str = str(lista_valores_mercados[iten])
-                valor_outro: str = valor_outro.replace(",", "")
-                valor_outro: str = valor_outro.strip()
-            
-            # Inseri o item extraido no banco de dados
-            aplicar_banco(f"INSERT INTO outro (nome, valor, id_produto) values ('{iten}', '{valor_outro}', (select id from produto where nome = '{nome_produto}'))")
-            
-            # Fecha a tela de detalhes dos produtos aberta
-            ActionChains(driver).send_keys(Keys.ESCAPE).perform()
+                # Loop para percorer o dicionario dos valores obtidos dos concorrentes
+                for iten in lista_valores_mercados:
+                    valor_outro: str = str(lista_valores_mercados[iten])
+                    valor_outro: str = valor_outro.replace(",", "")
+                    valor_outro: str = valor_outro.strip()
+                # Inseri o item extraido no banco de dados
+                    aplicar_banco(f"INSERT INTO outro (nome, valor, id_produto) values ('{iten}', '{valor_outro}', (select id from produto where nome = '{nome_produto}'))")
+                
+                
+                # Fecha a tela de detalhes dos produtos aberta
+                ActionChains(driver).send_keys(Keys.ESCAPE).perform()
         
         
         
