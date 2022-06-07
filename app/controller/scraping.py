@@ -54,7 +54,7 @@ def extrair_dados(categoria) -> dict:
      Returns:
         _list_: _Retorna uma lista com os produtos percorrido_
     """
-    
+    print("Scraping...")
     for chave_categoria in categoria:
        
         """ Acessa a pagina da sub_categoria e cria um dicionario tendo como chave
@@ -88,7 +88,10 @@ def extrair_dados(categoria) -> dict:
         
         for id,  lista in enumerate(lista_produtos):
             if id <= len(lista_produtos) - 2:
-                lista.find_element(By.TAG_NAME, "button").click()
+                try:
+                    lista.find_element(By.TAG_NAME, "button").click()
+                except:
+                    print("Proxima categoria!")
                 # Obter data hora
                 dt = datetime.now()
                 # Converter timestamp para gravar no banco

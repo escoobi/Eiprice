@@ -16,7 +16,7 @@ def aplicar_banco(sql: str) -> None:
     cursor.execute(sql)
     conexao_pg.commit()
   except (Exception, psycopg2.DatabaseError) as e:
-    print("Error: %s" % e)
+    # print("Error: %s" % e)
     conexao_pg.rollback()
     cursor.close()
     return 1
@@ -31,7 +31,7 @@ def consultar(sql: str) -> Tuple:
     row = cursor.fetchall()
     return row
   except (Exception, psycopg2.DatabaseError) as e:
-    print("Error: %s" % e)
+    # print("Error: %s" % e)
     conexao_pg.rollback()
     cursor.close()
     return None
