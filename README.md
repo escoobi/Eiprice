@@ -1,19 +1,14 @@
-Avaliação Técnica
-Criar um web scraping para extração de dados no shopper, este script permite consultar todos
-os dados do departamento Alimentos assim como seus níveis
-Ex: Categorias, Subcategorias caso estejam presentes
-BASE URL: https://unica.shopper.com.br/shop/#bemvindo
-DEPARTAMENTO: Alimentos
-obs:
-- Caso o script apresente uma falha inesperada o mesmo deve permitir voltar do estado atual.
-Layout do arquivo assortment.csv:
+Python >= 3.9
+Postgres >= 11
 
-Plus
-Script Exportação Relatório(s) consolidados
-com os layout definidos
-acima:
-assortment.csv
-seller.csv
-Sim
-Prazo Entrega: 3 dias após o envio do teste
-Repositórios para entrega dos dados: Git Lab, Bitbucket ou Github
+Libs utilizadas:
+Selenium
+Pandas
+FastApi
+psycopg2
+
+
+Observação: 
+1 - Cadastrar no https://shopper.com.br e adicionar o email e senha em main.py na chamada de função "extrair_dados"
+2 - Criar um banco de dados no postgres com o nome "eiprice" e passar o usuário e senha de acesso ao banco na variavel caminho_db no arquivo eiprice_db.py
+3 - Apos o scraping iniciar o serviço da API com o comando: uvicorn main:app --reload
