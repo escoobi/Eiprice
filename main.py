@@ -1,8 +1,6 @@
-from re import T
 from app.controller.scraping import extrair_dados, obter_categorias
 from app.controller.eiprice_db import aplicar_banco, consultar
-from fastapi import FastAPI, Response
-from typing import Union
+from fastapi import FastAPI
 import pandas as pd
 
 
@@ -16,38 +14,34 @@ import pandas as pd
 
 app = FastAPI()
 
-@app.get("/")
-async def root():
-    dados_recebido = consultar(f"select nome from categoria")
-    df = pd.DataFrame(dados_recebido, columns=['nome'])
-    return Response(df.to_json(), media_type="application/json")
-
-@app.get("/seller")
-async def seller():
-    df = pd.DataFrame(consultar("select categoria.nome, sub_categoria.nome, produto.id, produto.nome, produto.img, produto.valor, produto.desconto, produto.dt_hora from produto inner join sub_categoria on sub_categoria.id = produto.id_sub_categoria inner join categoria on categoria.id = sub_categoria.id_categoria"), columns =['categoria', 'departamento', 'id', 'nome', 'img', 'valor', 'desconto', 'data_hora'])
-    df.to_csv('seller.csv')
-    dd = df.to_dict('records')
+@app.get("/categoria/")
+async def read_categoria():
+    dados_recebido = consultar(f"select id, nome from categoria")
+    df = pd.DataFrame(dados_recebido, columns=['id', 'nome'])
+    dd = df.set_index("id").T.to_dict("dict")
     return dd
-    
 
-@app.get("/categoria/{categoria_nome}")
-def read_item(categoria_nome: str):
-    dados_recebido = consultar(f"select distinct(nome) from categoria where nome = '{categoria_nome}'")
-    df = pd.DataFrame(dados_recebido, columns=['nome'])
-    return Response(df.to_json(), media_type="application/json")
+
+@app.get("/categoria/{id_categoria}")
+async def read_categoria_id(id_categoria: str):
+    dados_recebido = consultar(f"select id, distinct(nome) from categoria where id = '{id_categoria}'")
+    df = pd.DataFrame(dados_recebido, columns=['id', 'nome'])
+    dd = df.set_index("id").T.to_dict("dict")
+    return dd
 
 
 @app.get("/categoria/departamento/")
-def read_item():
+async def read_departamento():
     dados_recebido = consultar(f"select id, nome from sub_categoria")
-    df = pd.DataFrame(dados_recebido, columns=['id', 'nome'])
-    df = df.set_index("id")
-    return Response(df.to_json(), media_type="application/json")
+    df = pd.DataFrame(dados_recebido, columns=['id','nome'])
+    dd = df.set_index("id").T.to_dict("dict")
+    return dd
 
-@app.get("/categoria/departamento/{departamento_nome}")
-def read_item(departamento_nome: str):
-    dados_recebido = consultar(f"select id, nome from sub_categoria where nome = '{departamento_nome}'")
-    df = pd.DataFrame(dados_recebido, columns=['nome'])
-    return Response(df.to_json(), media_type="application/json")
+@app.get("/categoria/departamento/{id_departamento}")
+async def read_departamento_id(id_departamento: str):
+    dados_recebido = consultar(f"select id, nome from sub_categoria where id = '{id_departamento}'")
+    df = pd.DataFrame(dados_recebido, columns=['id', 'nome'])
+    dd = df.set_index("id").T.to_dict("dict")
+    return dd
  
 
