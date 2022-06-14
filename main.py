@@ -1,5 +1,6 @@
 from app.controller.scraping import extrair_dados, obter_categorias
 from app.controller.eiprice_db import aplicar_banco, consultar
+from app.controller.raspagem import obter_dados
 from fastapi import FastAPI
 import pandas as pd
 
@@ -12,11 +13,13 @@ import pandas as pd
 # Chama a função para realizar o scraping e armazenas no banco de dados
 #extrair_dados(obter_categorias("alimentos", "*", "*"))
 
+
 app = FastAPI()
 
 @app.get("/")
 async def root():
-    return "Teste Eiprice para backend."
+    #Outro formar de raspagem de dados sem o uso do Selenium
+    return obter_dados()
 
 
 @app.get("/categoria/")
