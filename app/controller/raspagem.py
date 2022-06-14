@@ -1,5 +1,13 @@
 import requests
+from app.models.assortment import Assortment
+from datetime import datetime
 
+
+#Criar instancia do objeto
+assortment = Assortment
+
+#Lista para retontar os dicionarios
+dados_coletados: list = []
 
 def obter_dados() -> list:
     """Função para realizar a raspagem do dados
@@ -7,8 +15,6 @@ def obter_dados() -> list:
     Returns:
         list: _Lista contendo dos os dicionarios extraido do site_
     """
-    #Lista para retontar os dicionarios
-    dados_coletados: list = []
     #Url da base Json
     base_url = "https://siteapi.shopper.com.br/catalog"
     # Coletear o valor no site
@@ -23,21 +29,36 @@ def obter_dados() -> list:
     #List Comprehensions no departamento de Alimentos
     departments = [lista for lista in dados["departments"] if lista["name"] == "Alimentos"]
     
-    #Laço para formular e extrair dos dicionarios obtidos
+   #Laço para formular e extrair dos dicionarios obtidos
     for lista in departments:
         #Laço dentro do deparamento para coletar os sub-departamentos
         for subcategoria in lista["subdepartments"]:
             page = 0
             last = False
+            print(subcategoria['name'])
             while not last:
                 page += 1
                 #Montagem da url para solicitar o request passando como paramentro o cabeçalho montado.
                 url = f"{base_url}/products?department={lista['id']}&subdepartment={subcategoria['id']}&page={page}&size=20&"
                 response = requests.get(url, headers=header)
                 data = response.json()
-                #dados: dict = {}
-                #dados = data
-                dados_coletados.append(data["products"])
-                last = data["last"]
+                
+                for contador in range(0,len(data['products'])):
+                    assortment.sku = data["products"][contador]["id"]
+                    assortment.url = data["products"][contador]["url"]
+                    assortment.name = data["products"][contador]["name"]
+                    assortment.image = data["products"][contador]["image"]
+                    assortment.price_to = data["products"][contador]["price"]
+                    assortment.discount = data["products"][contador]["savingPercentage"]
+                    assortment.department = data["products"][contador]["metadata"]["department_url"]
+                    assortment.category = data["products"][contador]["metadata"]["subdepartment_url"]
+                    assortment.available = data["products"][contador]["paused"]
+                    assortment.stock_qty = data["products"][contador]["maxCartQuantity"]
+                    assortment.created_at = datetime.today().strftime("%Y-%m-%d")
+                    assortment.hour = datetime.today().strftime("%H:%M:%S")
+                    #print(f"{assortment.sku}: {assortment.name}")
+                    dados_coletados.append({assortment.sku: assortment.name})
+                    last = data["last"]
+                
     
     return dados_coletados
