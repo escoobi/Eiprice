@@ -65,3 +65,6 @@ class Assortment:
     @property
     def hour(self):
         return self.__hour
+    
+    #def __repr__(self):
+    #    return {f"name: {self.name}, sku: {self.sku}, department: {self.department}, category: {self.category}, url: {self.url}, image: {self.image}, price_to: {self.price_to}, discount: {self.discount}, available: {self.available}, stock_qty: {self.stock_qty}, created_at: {self.created_at}, hour: {self.hour}"}

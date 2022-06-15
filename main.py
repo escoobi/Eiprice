@@ -1,7 +1,5 @@
-from app.controller.scraping import extrair_dados, obter_categorias
-from app.controller.eiprice_db import aplicar_banco, consultar
-from app.controller.raspagem import obter_dados, dados_coletados
-from app.controller.dados import eca
+from app.controller.eiprice_db import consultar
+from app.controller.raspagem import obter_dados
 from fastapi import FastAPI
 import pandas as pd
 
@@ -24,67 +22,10 @@ while obter:
 
 app = FastAPI()
 
-@app.get("/")
+@app.post("/")
 async def root():
     #Outro formar de raspagem de dados sem o uso do Selenium
-    return dados_coletados
-
-
-@app.get("/categoria/")
-async def read_categoria():
-    """Rota para lista todas as categorias cadastradas
-
-    Returns:
-        _dict_: _Retorna um dicionario com todas as categoria cadastrada no banco de dados_
-    """
-    dados_recebido = consultar(f"select id, nome from categoria")
-    df = pd.DataFrame(dados_recebido, columns=['id', 'nome'])
-    dd = df.set_index("id").T.to_dict("dict")
-    return dd
-
-
-@app.get("/categoria/{id_categoria}")
-async def read_categoria_id(id_categoria: str):
-    """Rota para consultar a categoria cadastra
-
-    Args:
-        id_categoria (str): _recebe um valor inteiro referente ao id cadastrado no banco de dados da categoria_
-
-    Returns:
-        _dicr_: _Retorna um dicionario contendo o id e nome da categoria seleciona_
-    """
-    dados_recebido = consultar(f"select id, distinct(nome) from categoria where id = '{id_categoria}'")
-    df = pd.DataFrame(dados_recebido, columns=['id', 'nome'])
-    dd = df.set_index("id").T.to_dict("dict")
-    return dd
-
-
-@app.get("/categoria/departamento/")
-async def read_departamento():
-    """Rota para listar todos os departamento cadastrado no banco de dados
-
-    Returns:
-        _dict_: _Retorna um dicionario contendo o id e nome dos departamento cadastrado_
-    """
-    dados_recebido = consultar(f"select id, nome from sub_categoria")
-    df = pd.DataFrame(dados_recebido, columns=['id','nome'])
-    dd = df.set_index("id").T.to_dict("dict")
-    return dd
-
-@app.get("/categoria/departamento/{id_departamento}")
-async def read_departamento_id(id_departamento: str):
-    """Rota para consulta do departamento
-
-    Args:
-        id_departamento (str): _Passa como paramentro o numero referente ao id cadastrado do departamento no banco de dados_
-
-    Returns:
-        _dict_: _Retorna um dicionario contendo id e nome do departamento selecionado_
-    """
-    dados_recebido = consultar(f"select id, nome from sub_categoria where id = '{id_departamento}'")
-    df = pd.DataFrame(dados_recebido, columns=['id', 'nome'])
-    dd = df.set_index("id").T.to_dict("dict")
-    return dd
+    return {"Shopper": "scraping"}
 
 @app.get("/{id_categoria}/{id_departamento}/{id_produto}")
 async def read_departamento_id(id_categoria, id_departamento, id_produto: str):
@@ -107,5 +48,6 @@ async def read_departamento_id(id_categoria, id_departamento, id_produto: str):
     df_outro = pd.DataFrame(dados_recebido, columns=['nome', 'valor'])
     tabela_outro = df_outro.set_index("nome").to_dict("dict")
     tabela_produto.update(tabela_outro)
+    
     return tabela_produto
 

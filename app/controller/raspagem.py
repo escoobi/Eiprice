@@ -6,10 +6,7 @@ from datetime import datetime
 #Criar instancia do objeto
 assortment = Assortment
 
-#Lista para retontar os dicionarios
-dados_coletados: list = []
-
-def obter_dados() -> list:
+def obter_dados() -> Assortment:
     """Função para realizar a raspagem do dados
 
     Returns:
@@ -56,9 +53,6 @@ def obter_dados() -> list:
                     assortment.stock_qty = data["products"][contador]["maxCartQuantity"]
                     assortment.created_at = datetime.today().strftime("%Y-%m-%d")
                     assortment.hour = datetime.today().strftime("%H:%M:%S")
-                    #print(f"{assortment.sku}: {assortment.name}")
-                    dados_coletados.append({assortment.sku: assortment.name})
                     last = data["last"]
                 
-    
-    return dados_coletados
+    return assortment
